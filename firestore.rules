@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Function to check if the user is authenticated (admin)
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    // Menu: Anyone can read, only admin can write
+    match /menu/{menuId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Blogs: Anyone can read, only admin can write
+    match /blogs/{blogId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Contact Messages: Anyone can create, only admin can read/update/delete
+    match /contactMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Reservations: Anyone can create, only admin can read/update/delete
+    match /reservations/{reservationId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Orders: Anyone can create, only admin can read/update/delete
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>itz_yb_29 Coffee Shop</title>
+
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css?v=3">
+
+</head>
+
+<body>
+
+    <!-- header section starts  -->
+
+    <header class="header">
+
+        <a href="#" class="logo">
+            <img src="images/logo.png" alt="">
+        </a>
+
+        <nav class="navbar">
+            <a href="#home">home</a>
+            <a href="#about">about</a>
+            <a href="#menu">menu</a>
+            <a href="#products">products</a>
+            <a href="#review">review</a>
+            <a href="#reservation">book table</a>
+            <a href="#contact">contact</a>
+            <a href="#blogs">blogs</a>
+        </nav>
+
+        <div class="icons">
+            <div class="fas fa-search" id="search-btn"></div>
+            <div class="fas fa-shopping-cart" id="cart-btn">
+                <span class="cart-badge" id="cart-badge">0</span>
+            </div>
+            <div class="fas fa-bars" id="menu-btn"></div>
+        </div>
+
+        <div class="search-form">
+            <input type="search" id="search-box" placeholder="search here...">
+            <label for="search-box" class="fas fa-search"></label>
+        </div>
+
+        <div class="cart-items-container">
+            <div class="cart-header">
+                <h2>Shopping Cart</h2>
+                <span class="fas fa-times" id="close-cart-btn"></span>
+            </div>
+            <div class="cart-list" id="cart-list">
+                <!-- Cart items dynamically rendered here -->
+            </div>
+            <div class="cart-summary" id="cart-summary">
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span class="total-price" id="cart-total-price">&#8377;0</span>
+                </div>
+                <!-- Checkout customer details fields (for Razorpay) -->
+                <div class="cart-checkout-fields" id="cart-checkout-fields">
+                    <div class="cart-input-box">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="checkout-name" placeholder="your name" required>
+                    </div>
+                    <div class="cart-input-box">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="checkout-phone" placeholder="phone number" required>
+                    </div>
+                </div>
+                <div class="cart-actions">
+                    <button class="clear-cart-btn" id="clear-cart-btn">Clear Cart</button>
+                    <button class="checkout-btn" id="checkout-btn">Checkout Now</button>
+                </div>
+            </div>
+        </div>
+
+    </header>
+
+    <!-- header section ends -->
+
+    <!-- home section starts  -->
+
+    <section class="home" id="home">
+
+        <div class="content animate-on-scroll fade-up">
+            <h3>More Than Coffee.A Feeling</h3>
+            <p>Some Love Stories Start With Coffee and End With Forever</p>
+            <a href="#menu" class="btn">get yours now</a>
+        </div>
+
+    </section>
+
+    <!-- home section ends -->
+
+    <!-- about section starts  -->
+
+    <section class="about" id="about">
+
+        <h1 class="heading animate-on-scroll fade-up"> <span>about</span> us </h1>
+
+        <div class="row">
+
+            <div class="image animate-on-scroll slide-left">
+                <img src="images/about-img.jpeg" alt="">
+            </div>
+
+            <div class="content animate-on-scroll slide-right">
+                <h3>what makes our coffee special?</h3>
+                <p>Every cup is a quiet ritual-steam rising like a held breath, warmth settling in like a familiar hand.
+                    This is where first glances turn into long mornings, and long mornings turn into forever.</p>
+                <p>We don't just serve coffee, we hold space for stories still being written. Stay a little longer. Let
+                    the moment linger, the way the last sip always does.</p>
+                <a href="#menu" class="btn">Begin Your Story</a>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- about section ends -->
+
+    <!-- menu section starts  -->
+
+    <section class="menu" id="menu">
+
+        <h1 class="heading animate-on-scroll fade-up"> our <span>menu</span> </h1>
+
+        <!-- Category Filter Tabs -->
+        <div class="menu-filter" id="menu-filter">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="hot-coffee">Hot Coffee</button>
+            <button class="filter-btn" data-filter="hot-specials">Hot Specials</button>
+            <button class="filter-btn" data-filter="iced-coffee">Iced Coffee</button>
+            <button class="filter-btn" data-filter="iced-blended">Iced Blended</button>
+            <button class="filter-btn" data-filter="shakes">Shakes</button>
+            <button class="filter-btn" data-filter="signature">Signature</button>
+            <button class="filter-btn" data-filter="others">Others</button>
+        </div>
+
+        <!-- Full Menu Grid -->
+        <div class="full-menu-container">
+
+
+            <div id="menu-loader" class="menu-loader">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Brewing our freshest menu...</p>
+            </div>
+            
+            <div id="dynamic-menu"></div>
+
+        <!-- ADD ONS -->
+        <div class="menu-addons">
+            <div class="category-header">
+                <i class="fas fa-plus-circle"></i>
+                <h2>Add Ons</h2>
+            </div>
+            <div class="addons-grid">
+                <div class="addon-chip" data-name="Espresso Single Shot" data-price="50">Espresso Single Shot <span>&#8377;50</span><i class="fas fa-plus-circle addon-add-icon"></i></div>
+                <div class="addon-chip" data-name="Chocolate / Caramel Sauce" data-price="20">Chocolate / Caramel Sauce <span>&#8377;20</span><i class="fas fa-plus-circle addon-add-icon"></i></div>
+                <div class="addon-chip" data-name="Whipped Cream" data-price="60">Whipped Cream <span>&#8377;60</span><i class="fas fa-plus-circle addon-add-icon"></i></div>
+                <div class="addon-chip" data-name="Extra Syrup" data-price="30">Extra Syrup <span>&#8377;30</span><i class="fas fa-plus-circle addon-add-icon"></i></div>
+                <div class="addon-chip" data-name="Nutella" data-price="50">Nutella <span>&#8377;50</span><i class="fas fa-plus-circle addon-add-icon"></i></div>
+                <div class="addon-chip" data-name="Choco Chips" data-price="20">Choco Chips <span>&#8377;20</span><i class="fas fa-plus-circle addon-add-icon"></i></div>
+            </div>
+            <div class="badge-legend">
+                <span class="badge badge-barista">&#9749; Barista Special</span>
+                <span class="badge badge-hot">&#128293; Hot Selling</span>
+            </div>
+        </div>
+
+    </div>
+
+    </section>
+
+    <!-- menu section ends -->
+
+    <!-- products section starts  -->
+
+    <section class="products" id="products">
+
+        <h1 class="heading animate-on-scroll fade-up"> our <span>products</span> </h1>
+
+        <div class="box-container">
+
+            <div class="box animate-on-scroll fade-up">
+                <div class="icons">
+                    <a href="#" class="fas fa-shopping-cart product-add-to-cart" data-name="Arabica Blend" data-price="499" data-image="images/cafena-arabica-blend.png"></a>
+                    <a href="#" class="fas fa-heart action-btn" title="Add to Wishlist"></a>
+                    <a href="#" class="fas fa-eye action-btn" title="Quick View"></a>
+                </div>
+                <div class="image">
+                    <img src="images/cafena-arabica-blend.png" alt="Cafena Arabica Blend">
+                </div>
+                <div class="content">
+                    <h3>Arabica Blend</h3>
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="price">&#8377;499 <span>&#8377;699</span></div>
+                </div>
+            </div>
+
+            <div class="box animate-on-scroll fade-up">
+                <div class="icons">
+                    <a href="#" class="fas fa-shopping-cart product-add-to-cart" data-name="Dark Roast" data-price="599" data-image="images/cafena-dark-roast.png"></a>
+                    <a href="#" class="fas fa-heart action-btn" title="Add to Wishlist"></a>
+                    <a href="#" class="fas fa-eye action-btn" title="Quick View"></a>
+                </div>
+                <div class="image">
+                    <img src="images/cafena-dark-roast.png" alt="Cafena Dark Roast">
+                </div>
+                <div class="content">
+                    <h3>Dark Roast</h3>
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="price">&#8377;599 <span>&#8377;799</span></div>
+                </div>
+            </div>
+
+            <div class="box animate-on-scroll fade-up">
+                <div class="icons">
+                    <a href="#" class="fas fa-shopping-cart product-add-to-cart" data-name="Signature Blend" data-price="749" data-image="images/cafena-signature-blend.png"></a>
+                    <a href="#" class="fas fa-heart action-btn" title="Add to Wishlist"></a>
+                    <a href="#" class="fas fa-eye action-btn" title="Quick View"></a>
+                </div>
+                <div class="image">
+                    <img src="images/cafena-signature-blend.png" alt="Cafena Signature Blend">
+                </div>
+                <div class="content">
+                    <h3>Signature Blend</h3>
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="price">&#8377;749 <span>&#8377;999</span></div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- review section starts  -->
+
+    <section class="review" id="review">
+
+        <h1 class="heading animate-on-scroll fade-up"> customer's <span>review</span> </h1>
+
+        <div class="box-container">
+
+            <div class="box animate-on-scroll fade-up">
+                <img src="images/quote-img.png" alt="" class="quote">
+                <p>Cafena isn't just about great coffee — it's the whole experience. Cozy seating, warm lighting, and a menu that never disappoints. Their Butterscotch Latte is pure comfort in a cup.</p>
+                <img src="images/sr.png" class="user" alt="">
+                <h3>N Rancho</h3>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+
+            <div class="box animate-on-scroll fade-up">
+                <img src="images/quote-img.png" alt="" class="quote">
+                <p>I've tried coffee shops all over the city, but nothing compares to Cafena. Fresh beans, perfectly brewed every time, and the staff treats you like family. Five stars, always.</p>
+                <img src="images/sr2.png" class="user" alt="">
+                <h3>Dev Reddy</h3>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+
+            <div class="box animate-on-scroll fade-up">
+                <img src="images/quote-img.png" alt="" class="quote">
+                <p>As someone who values consistency, I'm impressed by how reliably good every cup is here. The Americano is expertly balanced, and the atmosphere is ideal for focused work.</p>
+                <img src="images/pic-3.png" class="user" alt="">
+                <h3>Aanya Sharma</h3>
+                <div class="stars">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- review section ends -->
+
+    <!-- reservation section starts -->
+    <section class="reservation" id="reservation">
+        <h1 class="heading animate-on-scroll fade-up"> book a <span>table</span> </h1>
+        <div class="row">
+            <form id="reservation-form" class="animate-on-scroll fade-in">
+                <h3>reserve your spot</h3>
+                <div class="inputBox">
+                    <span class="fas fa-user"></span>
+                    <input type="text" id="res-name" placeholder="your name" required>
+                </div>
+                <div class="inputBox">
+                    <span class="fas fa-phone"></span>
+                    <input type="tel" id="res-phone" placeholder="phone number" required>
+                </div>
+                <div class="inputBox">
+                    <span class="fas fa-calendar-alt"></span>
+                    <input type="date" id="res-date" required>
+                </div>
+                <div class="inputBox">
+                    <span class="fas fa-clock"></span>
+                    <input type="time" id="res-time" required>
+                </div>
+                <div class="inputBox">
+                    <span class="fas fa-users"></span>
+                    <input type="number" id="res-guests" placeholder="number of guests" min="1" max="20" required>
+                </div>
+                <input type="submit" value="book now" class="btn">
+            </form>
+        </div>
+    </section>
+    <!-- reservation section ends -->
+
+    <!-- contact section starts  -->
+    <section class="contact" id="contact">
+
+        <h1 class="heading animate-on-scroll fade-up"> <span>contact</span> us </h1>
+
+        <div class="row">
+
+            <iframe class="map animate-on-scroll slide-left"
+                src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3780.9107584161575!2d73.8115138!3d18.6230833!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2b860d63876d1%3A0x9bccd5081468bc36!2sDr.%20D.%20Y.%20Patil%20Institute%20of%20Technology!5e0!3m2!1sen!2sin!4v1783626901803!5m2!1sen!2sin"
+                allowfullscreen="" loading="lazy"></iframe>
+
+            <form id="contact-form" class="animate-on-scroll slide-right">
+                <h3>get in touch</h3>
+                <div class="inputBox">
+                    <span class="fas fa-user"></span>
+                    <input type="text" id="contact-name" placeholder="name" required>
+                </div>
+                <div class="inputBox">
+                    <span class="fas fa-envelope"></span>
+                    <input type="email" id="contact-email" placeholder="email" required>
+                </div>
+                <div class="inputBox">
+                    <span class="fas fa-comment-alt"></span>
+                    <input type="text" id="contact-message" placeholder="your message" required>
+                </div>
+                <input type="submit" value="contact now" class="btn">
+            </form>
+
+        </div>
+
+    </section>
+    <!-- contact section ends -->
+
+    <!-- blogs section starts  -->
+
+    <section class="blogs" id="blogs">
+
+        <h1 class="heading animate-on-scroll fade-up"> our <span>blogs</span> </h1>
+
+        <div class="box-container" id="blogs-container">
+            <div id="blogs-loader" class="menu-loader" style="grid-column: 1 / -1;">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Grinding stories and brewing articles...</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- blogs section ends -->
+
+    <!-- footer section starts  -->
+
+    <section class="footer">
+
+        <div class="share">
+            <a href="https://www.facebook.com/share/1HCTQ2b9ev/" target="_blank" rel="noopener noreferrer" class="fab fa-facebook-f"></a>
+            <a href="#" class="fab fa-twitter"></a>
+            <a href="#" class="fab fa-instagram"></a>
+            <a href="https://www.linkedin.com/in/yogesh-bhangale-0707b3329/" target="_blank" rel="noopener noreferrer" class="fab fa-linkedin"></a>
+            <a href="#" class="fab fa-pinterest"></a>
+        </div>
+
+        <div class="links">
+            <a href="#home">home</a>
+            <a href="#about">about</a>
+            <a href="#menu">menu</a>
+            <a href="#products">products</a>
+            <a href="#review">review</a>
+            <a href="#reservation">book table</a>
+            <a href="#contact">contact</a>
+            <a href="#blogs">blogs</a>
+        </div>
+
+        <div class="credit">created by <span>Yogesh Bhangale</span> | all rights reserved</div>
+
+    </section>
+
+    <!-- footer section ends -->
+
+    <!-- toast notification container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // Menu category filter (handled globally now since we'll run filter bindings on dynamic content load)
+        window.initMenuFilter = () => {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const categories = document.querySelectorAll('.menu-category');
+            const addonsSection = document.querySelector('.menu-addons');
+
+            filterBtns.forEach(btn => {
+                // Clear any existing listeners by cloning
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+
+                newBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    newBtn.classList.add('active');
+
+                    const filter = newBtn.dataset.filter;
+
+                    document.querySelectorAll('.menu-category').forEach(cat => {
+                        if (filter === 'all' || cat.dataset.category === filter) {
+                            cat.classList.remove('hide');
+                        } else {
+                            cat.classList.add('hide');
+                        }
+                    });
+
+                    if (addonsSection) {
+                        addonsSection.style.display = filter === 'all' ? 'block' : 'none';
+                    }
+                });
+            });
+        };
+    </script>
+
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- custom js file link  -->
+    <script type="module" src="js/script.js"></script>
+
+</body>
+
+</html>

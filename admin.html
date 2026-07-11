@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cafena | Admin Dashboard</title>
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>Cafena <span>Admin</span></h2>
+            <div id="login-error" class="error-msg"></div>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Admin Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit" id="login-btn">Secure Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Cafena <span>Admin</span></h2>
+            <ul class="nav-links">
+                <li class="active" data-tab="orders-tab"><i class="fas fa-box"></i> Orders</li>
+                <li data-tab="messages-tab"><i class="fas fa-envelope"></i> Messages</li>
+                <li data-tab="menu-tab"><i class="fas fa-coffee"></i> Menu</li>
+                <li data-tab="blogs-tab"><i class="fas fa-pen"></i> Blogs</li>
+                <li data-tab="reservations-tab"><i class="fas fa-chair"></i> Reservations</li>
+            </ul>
+            <button id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <!-- Orders Tab -->
+            <div id="orders-tab" class="tab-content active">
+                <h1>Orders List</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer Name</th>
+                            <th>Phone</th>
+                            <th>Items</th>
+                            <th>Total (&#8377;)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Messages Tab -->
+            <div id="messages-tab" class="tab-content">
+                <h1>Contact Messages</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody id="messages-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Menu Tab -->
+            <div id="menu-tab" class="tab-content">
+                <h1>Menu Manager</h1>
+                
+                <div style="margin-bottom: 3rem; background: var(--black); padding: 2rem; border-radius: .5rem; border: var(--border);">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">Add New Item</h3>
+                    <form id="add-menu-form">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="menu-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="menu-category" required>
+                                <option value="hot-coffee">Hot Coffee</option>
+                                <option value="hot-specials">Hot Specials</option>
+                                <option value="iced-coffee">Iced Coffee</option>
+                                <option value="iced-blended">Iced Blended</option>
+                                <option value="shakes">Shakes</option>
+                                <option value="signature">Signature</option>
+                                <option value="others">Others</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Price (&#8377;)</label>
+                            <input type="number" id="menu-price" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input type="text" id="menu-image" placeholder="images/placeholder.png" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description (Optional)</label>
+                            <textarea id="menu-desc"></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Add Item to Menu</button>
+                    </form>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menu-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Blogs Tab -->
+            <div id="blogs-tab" class="tab-content">
+                <h1>Blogs Manager</h1>
+
+                <div style="margin-bottom: 3rem; background: var(--black); padding: 2rem; border-radius: .5rem; border: var(--border);">
+                    <h3 style="color: #fff; margin-bottom: 1.5rem;">Draft New Blog</h3>
+                    <form id="add-blog-form">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" id="blog-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Author</label>
+                            <input type="text" id="blog-author" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input type="text" id="blog-image" placeholder="images/blog-1.jpeg" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Excerpt (Short Description)</label>
+                            <textarea id="blog-excerpt" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Content (Full text)</label>
+                            <textarea id="blog-content" rows="6" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="blog-status">
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Save Blog</button>
+                    </form>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Image</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Excerpt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blogs-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Reservations Tab -->
+            <div id="reservations-tab" class="tab-content">
+                <h1>Table Reservations</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requested At</th>
+                            <th>Date & Time</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Guests</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservations-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
