@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const { FieldValue } = require("firebase-admin/firestore");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const twilio = require("twilio");
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -124,6 +125,28 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
             status: "paid",
             createdAt: FieldValue.serverTimestamp()
         });
+
+        // Send SMS Receipt via Twilio
+        try {
+            const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+            const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+            const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+            
+            if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
+                const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
+                await twilioClient.messages.create({
+                    body: `Cafena: Thank you for your order, ${customerName}! We have received your payment of ₹${totalAmount} for ${items.length} item(s). We are preparing it now!`,
+                    from: twilioPhoneNumber,
+                    to: phone
+                });
+                console.log("SMS receipt sent successfully to", phone);
+            } else {
+                console.warn("Twilio credentials missing in .env, SMS skipped.");
+            }
+        } catch (smsError) {
+            console.error("Error sending SMS:", smsError);
+            // Proceed with returning success even if SMS fails
+        }
 
         res.json({
             success: true,
