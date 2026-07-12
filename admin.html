@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- custom css file link  -->
     <link rel="stylesheet" href="css/admin.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -30,7 +32,8 @@
         <div class="sidebar">
             <h2>Cafena <span>Admin</span></h2>
             <ul class="nav-links">
-                <li class="active" data-tab="orders-tab"><i class="fas fa-box"></i> Orders</li>
+                <li class="active" data-tab="analytics-tab"><i class="fas fa-chart-line"></i> Analytics</li>
+                <li data-tab="orders-tab"><i class="fas fa-box"></i> Orders</li>
                 <li data-tab="messages-tab"><i class="fas fa-envelope"></i> Messages</li>
                 <li data-tab="menu-tab"><i class="fas fa-coffee"></i> Menu</li>
                 <li data-tab="blogs-tab"><i class="fas fa-pen"></i> Blogs</li>
@@ -42,8 +45,39 @@
         <!-- Main Content -->
         <div class="main-content">
             
+            <!-- Analytics Tab -->
+            <div id="analytics-tab" class="tab-content active">
+                <h1>Dashboard Overview</h1>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Revenue</h3>
+                        <div class="value" id="stat-revenue">&#8377;0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Orders</h3>
+                        <div class="value" id="stat-orders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Items Sold</h3>
+                        <div class="value" id="stat-items">0</div>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Revenue Over Time</h3>
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Popular Items</h3>
+                        <canvas id="itemsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Orders Tab -->
-            <div id="orders-tab" class="tab-content active">
+            <div id="orders-tab" class="tab-content">
                 <h1>Orders List</h1>
                 <table>
                     <thead>

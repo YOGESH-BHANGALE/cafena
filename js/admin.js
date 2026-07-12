@@ -97,11 +97,125 @@ document.querySelectorAll('.nav-links li').forEach(tab => {
 
 // --- Dashboard Data Loading ---
 function loadDashboardData() {
+    loadAnalytics();
     loadOrders();
     loadMessages();
     loadMenu();
     loadBlogs();
     loadReservations();
+}
+
+// 0. Load Analytics
+async function loadAnalytics() {
+    try {
+        const snapshot = await getDocs(collection(db, 'orders'));
+        let totalRevenue = 0;
+        let totalOrders = 0;
+        let totalItems = 0;
+        
+        const dateRevenueMap = {};
+        const itemsMap = {};
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.status === 'paid') {
+                totalRevenue += data.totalAmount || 0;
+                totalOrders += 1;
+                
+                const dateKey = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Unknown';
+                dateRevenueMap[dateKey] = (dateRevenueMap[dateKey] || 0) + (data.totalAmount || 0);
+                
+                if (data.items) {
+                    data.items.forEach(item => {
+                        totalItems += item.quantity || 1;
+                        itemsMap[item.name] = (itemsMap[item.name] || 0) + (item.quantity || 1);
+                    });
+                }
+            }
+        });
+        
+        // Update DOM
+        document.getElementById('stat-revenue').innerHTML = `&#8377;${totalRevenue}`;
+        document.getElementById('stat-orders').textContent = totalOrders;
+        document.getElementById('stat-items').textContent = totalItems;
+        
+        // Render Charts
+        renderRevenueChart(dateRevenueMap);
+        renderItemsChart(itemsMap);
+        
+    } catch (error) {
+        console.error("Error loading analytics:", error);
+    }
+}
+
+let revenueChartInstance = null;
+function renderRevenueChart(dataMap) {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const labels = Object.keys(dataMap);
+    const data = Object.values(dataMap);
+    
+    if (revenueChartInstance) revenueChartInstance.destroy();
+    
+    revenueChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: data,
+                borderColor: '#d3ad7f',
+                backgroundColor: 'rgba(211, 173, 127, 0.2)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#fff' } }
+            },
+            scales: {
+                x: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' }, beginAtZero: true }
+            }
+        }
+    });
+}
+
+let itemsChartInstance = null;
+function renderItemsChart(dataMap) {
+    const ctx = document.getElementById('itemsChart').getContext('2d');
+    
+    // Sort items by popularity
+    const sortedItems = Object.entries(dataMap).sort((a,b) => b[1] - a[1]).slice(0, 5); // top 5
+    const labels = sortedItems.map(item => item[0]);
+    const data = sortedItems.map(item => item[1]);
+    
+    if (itemsChartInstance) itemsChartInstance.destroy();
+    
+    itemsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Units Sold',
+                data: data,
+                backgroundColor: '#d3ad7f',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#fff' } }
+            },
+            scales: {
+                x: { ticks: { color: '#ccc' }, grid: { display: false } },
+                y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' }, beginAtZero: true }
+            }
+        }
+    });
 }
 
 // 1. Load Orders

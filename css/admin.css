@@ -271,3 +271,51 @@ td {
     font-size: 1.2rem;
     cursor: pointer;
 }
+
+/* --- Analytics Dashboard --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: var(--black);
+    padding: 3rem;
+    border-radius: 1rem;
+    border: var(--border);
+    text-align: center;
+}
+
+.stat-card h3 {
+    color: var(--text-light);
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card .value {
+    color: var(--main-color);
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.chart-container {
+    background: var(--black);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: var(--border);
+}
+
+.chart-container h3 {
+    color: #fff;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
