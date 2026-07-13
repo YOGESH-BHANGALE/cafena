@@ -33,9 +33,14 @@ exports.createOrder = onRequest({ cors: true, invoker: "public" }, async (req, r
     }
 
     try {
-        const { amount } = req.body;
+        const { amount, customerName, phone, items } = req.body;
         if (!amount || isNaN(amount) || amount <= 0) {
             res.status(400).json({ success: false, error: "Invalid or missing amount." });
+            return;
+        }
+        
+        if (!customerName || !phone || !items || !Array.isArray(items)) {
+            res.status(400).json({ success: false, error: "Missing customer or order details for pending order creation." });
             return;
         }
 
@@ -52,11 +57,28 @@ exports.createOrder = onRequest({ cors: true, invoker: "public" }, async (req, r
 
         const order = await razorpay.orders.create(options);
 
+        // Save order as pending in Firestore
+        const orderRef = await db.collection("orders").add({
+            customerName,
+            phone,
+            items: items.map(item => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.image || ""
+            })),
+            totalAmount: amount,
+            orderId: order.id,
+            status: "pending",
+            createdAt: FieldValue.serverTimestamp()
+        });
+
         res.json({
             success: true,
             orderId: order.id,
             amount: order.amount,
-            keyId: process.env.RAZORPAY_KEY_ID
+            keyId: process.env.RAZORPAY_KEY_ID,
+            docId: orderRef.id
         });
     } catch (error) {
         console.error("Error creating Razorpay order:", error);
@@ -76,20 +98,12 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
             razorpay_payment_id,
             razorpay_order_id,
             razorpay_signature,
-            customerName,
-            phone,
-            items,
-            totalAmount
+            docId
         } = req.body;
 
         // Basic validations
-        if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-            res.status(400).json({ success: false, error: "Missing Razorpay payment verification parameters." });
-            return;
-        }
-
-        if (!customerName || !phone || !items || !Array.isArray(items) || !totalAmount) {
-            res.status(400).json({ success: false, error: "Missing customer or order details." });
+        if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature || !docId) {
+            res.status(400).json({ success: false, error: "Missing Razorpay payment verification parameters or docId." });
             return;
         }
 
@@ -109,21 +123,22 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
             return;
         }
 
-        // Write order details to the Firestore collection
-        const orderRef = await db.collection("orders").add({
-            customerName,
-            phone,
-            items: items.map(item => ({
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                image: item.image || ""
-            })),
-            totalAmount,
+        // Update the existing pending order details to paid
+        const orderRef = db.collection("orders").doc(docId);
+        const orderSnap = await orderRef.get();
+        
+        if (!orderSnap.exists) {
+            res.status(404).json({ success: false, error: "Order document not found." });
+            return;
+        }
+        
+        const orderData = orderSnap.data();
+        const { customerName, phone, items, totalAmount } = orderData;
+
+        await orderRef.update({
             paymentId: razorpay_payment_id,
-            orderId: razorpay_order_id,
             status: "paid",
-            createdAt: FieldValue.serverTimestamp()
+            updatedAt: FieldValue.serverTimestamp()
         });
 
         // Send SMS Receipt via Twilio
@@ -150,8 +165,8 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
 
         res.json({
             success: true,
-            id: orderRef.id,
-            message: "Payment verified and order created successfully!"
+            id: docId,
+            message: "Payment verified and order marked as paid successfully!"
         });
     } catch (error) {
         console.error("Error verifying payment:", error);

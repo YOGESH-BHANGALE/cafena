@@ -161,7 +161,17 @@ async function checkout() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ amount: totalAmount })
+            body: JSON.stringify({ 
+                amount: totalAmount,
+                customerName: name,
+                phone: phone,
+                items: cart.map(item => ({
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image || ''
+                }))
+            })
         });
 
         if (!orderRes.ok) {
@@ -194,15 +204,7 @@ async function checkout() {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_signature: response.razorpay_signature,
-                            customerName: name,
-                            phone: phone,
-                            items: cart.map(item => ({
-                                name: item.name,
-                                price: item.price,
-                                quantity: item.quantity,
-                                image: item.image || ''
-                            })),
-                            totalAmount: totalAmount
+                            docId: orderData.docId
                         })
                     });
 
