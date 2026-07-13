@@ -199,7 +199,6 @@ section {
     top: 0;
     right: -110%;
     height: 100vh;
-    height: 100dvh; /* Fix for mobile browser nav bars */
     width: 38rem;
     background: rgba(19, 19, 26, 0.98);
     backdrop-filter: blur(1.5rem);
@@ -1358,11 +1357,6 @@ input:-webkit-autofill:active,
 
     html {
         font-size: 50%;
-    }
-
-    .header .cart-items-container {
-        width: 100vw; /* Take full width on small screens */
-        padding-bottom: 4rem; /* Extra padding for bottom reachability */
     }
 
 }
