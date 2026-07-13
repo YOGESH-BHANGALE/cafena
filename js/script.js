@@ -105,8 +105,6 @@ function addToCart(name, price, image) {
         cart.push({ name, price, image, quantity: 1 });
     }
     
-    // Auto open cart for user feedback
-    cartItem.classList.add('active');
     saveCart();
     showToast(`Added ${name} to your cart!`);
 }
