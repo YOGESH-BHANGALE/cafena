@@ -245,7 +245,7 @@ section {
 
 /* Cart Item List */
 .cart-list {
-    flex: 1;
+    flex: 0 1 auto;
     overflow-y: auto;
     padding-right: .5rem;
 }
