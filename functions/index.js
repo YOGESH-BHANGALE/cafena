@@ -216,7 +216,7 @@ Format your response exactly as a JSON array of objects, with each object having
 Only output the JSON array, no markdown formatting or extra text.`;
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-1.5-flash',
             contents: prompt,
         });
         
