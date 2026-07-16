@@ -4,6 +4,7 @@ const { FieldValue } = require("firebase-admin/firestore");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const twilio = require("twilio");
+const { GoogleGenAI } = require('@google/genai');
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -170,6 +171,65 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
         });
     } catch (error) {
         console.error("Error verifying payment:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 3. Cloud Function to Get AI Recommendations
+exports.getAIRecommendations = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+
+    try {
+        const { cartItems } = req.body;
+        if (!cartItems || !Array.isArray(cartItems)) {
+            res.status(400).json({ success: false, error: "Missing or invalid cart items." });
+            return;
+        }
+
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("Gemini API key is not configured.");
+            res.status(500).json({ success: false, error: "AI service is not configured." });
+            return;
+        }
+
+        // Initialize Gemini client
+        const ai = new GoogleGenAI({ apiKey: apiKey });
+
+        // Fetch the active menu to give the AI context
+        const menuSnapshot = await db.collection('menu').where('isAvailable', '==', true).get();
+        const menuNames = [];
+        menuSnapshot.forEach(doc => {
+            menuNames.push(doc.data().name);
+        });
+
+        const prompt = `You are an expert barista at Cafena. 
+The customer has the following items in their cart: ${cartItems.join(", ")}.
+Our full available menu is: ${menuNames.join(", ")}.
+Please recommend exactly 2 items from our menu that pair perfectly with their current cart. Do not recommend items they already have in their cart.
+Format your response exactly as a JSON array of objects, with each object having:
+- "name": The exact name of the recommended item from the menu.
+- "reason": A short, mouth-watering 1-sentence reason why it pairs perfectly.
+Only output the JSON array, no markdown formatting or extra text.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+        });
+        
+        let textResponse = response.text;
+        // Clean up potential markdown formatting from Gemini response
+        textResponse = textResponse.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+        
+        let recommendations = JSON.parse(textResponse);
+
+        res.json({ success: true, recommendations });
+
+    } catch (error) {
+        console.error("Error getting AI recommendations:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

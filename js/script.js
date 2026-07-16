@@ -25,6 +25,7 @@ const db = getFirestore(app);
 // --- Cloud Functions Endpoints ---
 const CREATE_ORDER_URL = "https://createorder-ah5moqsqoq-uc.a.run.app";
 const VERIFY_PAYMENT_URL = "https://verifypayment-ah5moqsqoq-uc.a.run.app";
+const GET_AI_REC_URL = "https://getairecommendations-ah5moqsqoq-uc.a.run.app";
 
 // --- DOM References for Layout Triggers ---
 const navbar = document.querySelector('.navbar');
@@ -47,6 +48,9 @@ document.querySelector('#cart-btn').onclick = () => {
     cartItem.classList.toggle('active');
     navbar.classList.remove('active');
     searchForm.classList.remove('active');
+    if (cartItem.classList.contains('active')) {
+        fetchAIRecommendations();
+    }
 };
 
 document.querySelector('#close-cart-btn').onclick = () => {
@@ -133,6 +137,72 @@ function clearCart() {
     saveCart();
     showToast("Cart cleared.");
 }
+
+// --- AI Recommendations ---
+let lastRecCartStr = "";
+async function fetchAIRecommendations() {
+    const aiContainer = document.getElementById('ai-recommendations');
+    const aiContent = document.getElementById('ai-rec-content');
+    
+    if (cart.length === 0) {
+        aiContainer.style.display = 'none';
+        return;
+    }
+
+    const currentCartStr = JSON.stringify(cart.map(i => i.name));
+    if (currentCartStr === lastRecCartStr) {
+        return; // Already fetched for this cart
+    }
+    
+    lastRecCartStr = currentCartStr;
+    aiContainer.style.display = 'block';
+    aiContent.innerHTML = '<div class="ai-loader"><i class="fas fa-spinner fa-spin"></i> Analyzing flavor profile...</div>';
+
+    try {
+        const res = await fetch(GET_AI_REC_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cartItems: cart.map(i => i.name) })
+        });
+        
+        if (!res.ok) throw new Error("Failed to fetch AI recs");
+        const data = await res.json();
+        
+        if (data.success && data.recommendations) {
+            let html = '';
+            data.recommendations.forEach(rec => {
+                html += `
+                    <div class="ai-item-card">
+                        <div class="ai-item-info">
+                            <strong>${rec.name}</strong>
+                            <p>${rec.reason}</p>
+                        </div>
+                        <button class="ai-item-btn" onclick="addToCartFromAI('${rec.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                `;
+            });
+            aiContent.innerHTML = html;
+        } else {
+            aiContainer.style.display = 'none';
+        }
+    } catch (error) {
+        console.error("AI Rec Error:", error);
+        aiContainer.style.display = 'none';
+    }
+}
+
+window.addToCartFromAI = async function(name) {
+    // Attempt to find price and image from DOM
+    const btn = document.querySelector(`.add-to-cart-btn[data-name="${name}"]`);
+    if (btn) {
+        addToCart(name, parseInt(btn.dataset.price), btn.dataset.image);
+    } else {
+        // Fallback for missing item
+        addToCart(name, 199, 'images/menu-1.png');
+    }
+};
 
 async function checkout() {
     if (cart.length === 0) {

@@ -1356,7 +1356,110 @@ input:-webkit-autofill:active,
 @media (max-width:450px) {
 
     html {
-        font-size: 50%;
     }
 
+}
+
+/* --- AI Barista Recommendations --- */
+.ai-recommendations {
+    background: rgba(211, 173, 127, 0.1);
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-recommendations::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(transparent, rgba(211, 173, 127, 0.3), transparent 30%);
+    animation: rotate 4s linear infinite;
+    z-index: 0;
+}
+
+.ai-recommendations::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: var(--bg);
+    border-radius: 6px;
+    z-index: 1;
+}
+
+@keyframes rotate {
+    100% { transform: rotate(1turn); }
+}
+
+.ai-recommendations > * {
+    position: relative;
+    z-index: 2;
+}
+
+.ai-recommendations h3 {
+    color: var(--main-color);
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.ai-rec-content {
+    font-size: 1.3rem;
+    color: #eee;
+    line-height: 1.6;
+}
+
+.ai-item-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.ai-item-info strong {
+    color: #fff;
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 1.4rem;
+}
+
+.ai-item-info p {
+    font-size: 1.2rem;
+    color: #ccc;
+}
+
+.ai-item-btn {
+    background: var(--main-color);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ai-item-btn:hover {
+    background: #fff;
+    color: var(--black);
+}
+
+.ai-loader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--main-color);
+    font-size: 1.4rem;
 }
