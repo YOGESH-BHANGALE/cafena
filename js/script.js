@@ -25,7 +25,7 @@ const db = getFirestore(app);
 // --- Cloud Functions Endpoints ---
 const CREATE_ORDER_URL = "https://createorder-ah5moqsqoq-uc.a.run.app";
 const VERIFY_PAYMENT_URL = "https://verifypayment-ah5moqsqoq-uc.a.run.app";
-const GET_AI_REC_URL = "https://getairecommendations-ah5moqsqoq-uc.a.run.app";
+const GET_AI_REC_URL = "https://us-central1-coffeeshop-y81-web-ac1f2.cloudfunctions.net/getAIRecommendations";
 
 // --- DOM References for Layout Triggers ---
 const navbar = document.querySelector('.navbar');
