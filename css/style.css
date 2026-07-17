@@ -1406,18 +1406,18 @@ input:-webkit-autofill:active,
 
 .ai-recommendations h3 {
     color: var(--main-color);
-    font-size: 1.6rem;
-    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.6rem;
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.6rem;
 }
 
 .ai-rec-content {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: #eee;
-    line-height: 1.6;
-    max-height: 250px;
+    line-height: 1.4;
+    max-height: 140px;
     overflow-y: auto;
     padding-right: 0.5rem;
 }
@@ -1436,9 +1436,9 @@ input:-webkit-autofill:active,
     justify-content: space-between;
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
-    padding: 1rem;
+    padding: 0.6rem;
     border-radius: 6px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
 }
 
 .ai-item-info {
@@ -1446,11 +1446,11 @@ input:-webkit-autofill:active,
 }
 
 .ai-item-img {
-    width: 5rem;
-    height: 5rem;
+    width: 3.5rem;
+    height: 3.5rem;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 1.5rem;
+    margin-right: 1rem;
     border: 1px solid var(--main-color);
 }
 
