@@ -99,6 +99,9 @@ let cart = JSON.parse(localStorage.getItem('coffee_shop_cart')) || [];
 function saveCart() {
     localStorage.setItem('coffee_shop_cart', JSON.stringify(cart));
     renderCart();
+    if (cartItem.classList.contains('active')) {
+        fetchAIRecommendations();
+    }
 }
 
 function addToCart(name, price, image) {
