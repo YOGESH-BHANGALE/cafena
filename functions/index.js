@@ -4,7 +4,7 @@ const { FieldValue } = require("firebase-admin/firestore");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const twilio = require("twilio");
-const { GoogleGenAI } = require('@google/genai');
+// Removed GoogleGenAI dependency as we are now using Groq via native fetch
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -189,15 +189,12 @@ exports.getAIRecommendations = onRequest({ cors: true, invoker: "public" }, asyn
             return;
         }
 
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = process.env.GROQ_API_KEY;
         if (!apiKey) {
-            console.error("Gemini API key is not configured.");
+            console.error("Groq API key is not configured.");
             res.status(500).json({ success: false, error: "AI service is not configured." });
             return;
         }
-
-        // Initialize Gemini client
-        const ai = new GoogleGenAI({ apiKey: apiKey });
 
         // Fetch the active menu to give the AI context
         const menuSnapshot = await db.collection('menu').where('isAvailable', '==', true).get();
@@ -208,23 +205,58 @@ exports.getAIRecommendations = onRequest({ cors: true, invoker: "public" }, asyn
 
         const prompt = `You are an expert barista at Cafena. 
 The customer has the following items in their cart: ${cartItems.join(", ")}.
-Our full available menu is: ${menuNames.join(", ")}.
-Please recommend exactly 2 items from our menu that pair perfectly with their current cart. Do not recommend items they already have in their cart.
+Our full available menu is exactly this list: [${menuNames.join(", ")}].
+
+RULES:
+1. You MUST recommend exactly 2 items.
+2. The recommended items MUST be chosen STRICTLY from the "Our full available menu" list provided above. Do NOT invent new items or recommend items not on the list.
+3. The name MUST match the menu list exactly.
+4. Do not recommend items they already have in their cart.
+
 Format your response exactly as a JSON array of objects, with each object having:
 - "name": The exact name of the recommended item from the menu.
 - "reason": A short, mouth-watering 1-sentence reason why it pairs perfectly.
 Only output the JSON array, no markdown formatting or extra text.`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
-            contents: prompt,
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.1
+            })
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Groq API error: ${response.status} ${errorText}`);
+        }
+
+        const data = await response.json();
+        let textResponse = data.choices[0].message.content;
         
-        let textResponse = response.text;
-        // Clean up potential markdown formatting from Gemini response
+        // Clean up potential markdown formatting from the response
         textResponse = textResponse.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
         
         let recommendations = JSON.parse(textResponse);
+
+        // Strict Validation: Ensure AI only recommended actual menu items
+        const availableForRec = menuNames.filter(name => !cartItems.includes(name));
+        recommendations = recommendations.map(rec => {
+            if (!menuNames.includes(rec.name)) {
+                // If AI hallucinated, fallback to a random valid item
+                const fallbackItem = availableForRec[Math.floor(Math.random() * availableForRec.length)];
+                return {
+                    name: fallbackItem,
+                    reason: "A perfect contrast to balance out the flavors in your cart!"
+                };
+            }
+            return rec;
+        });
 
         res.json({ success: true, recommendations });
 

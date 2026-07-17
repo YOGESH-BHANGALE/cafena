@@ -171,8 +171,22 @@ async function fetchAIRecommendations() {
         if (data.success && data.recommendations) {
             let html = '';
             data.recommendations.forEach(rec => {
+                let imgSrc = 'images/menu-1.png'; // Fallback image
+                try {
+                    // Try to find the image from the DOM button
+                    const btn = document.querySelector(`.add-to-cart-btn[data-name="${rec.name.replace(/"/g, '\\"')}"]`);
+                    if (btn && btn.dataset.image) {
+                        imgSrc = btn.dataset.image;
+                    }
+                } catch (e) {
+                    console.error("Could not find image for", rec.name);
+                }
+                
+                let imgHtml = `<img src="${imgSrc}" alt="${rec.name}" class="ai-item-img">`;
+
                 html += `
                     <div class="ai-item-card">
+                        ${imgHtml}
                         <div class="ai-item-info">
                             <strong>${rec.name}</strong>
                             <p>${rec.reason}</p>

@@ -1426,6 +1426,19 @@ input:-webkit-autofill:active,
     margin-bottom: 1rem;
 }
 
+.ai-item-info {
+    flex: 1;
+}
+
+.ai-item-img {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 1.5rem;
+    border: 1px solid var(--main-color);
+}
+
 .ai-item-info strong {
     color: #fff;
     display: block;
