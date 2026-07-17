@@ -150,12 +150,18 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
             
             if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
                 const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
+                
+                let formattedPhone = phone.trim();
+                if (!formattedPhone.startsWith('+')) {
+                    formattedPhone = '+91' + formattedPhone;
+                }
+
                 await twilioClient.messages.create({
                     body: `Cafena: Thank you for your order, ${customerName}! Track your order live here: https://coffeeshop-y81-web-ac1f2.web.app/track.html?id=${docId}`,
                     from: twilioPhoneNumber,
-                    to: phone
+                    to: formattedPhone
                 });
-                console.log("SMS receipt sent successfully to", phone);
+                console.log("SMS receipt sent successfully to", formattedPhone);
             } else {
                 console.warn("Twilio credentials missing in .env, SMS skipped.");
             }
@@ -305,17 +311,27 @@ exports.updateOrderStatus = onRequest({ cors: true }, async (req, res) => {
 
         // If status is "ready", send SMS
         if (newStatus === "ready") {
-            const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
-            const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-            const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
-            
-            if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
-                const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
-                await twilioClient.messages.create({
-                    body: `Cafena: Great news, ${orderData.customerName}! Your order is ready for pickup!`,
-                    from: twilioPhoneNumber,
-                    to: orderData.phone
-                });
+            try {
+                const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+                const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+                const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+                
+                if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
+                    const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
+                    
+                    let formattedPhone = orderData.phone.trim();
+                    if (!formattedPhone.startsWith('+')) {
+                        formattedPhone = '+91' + formattedPhone;
+                    }
+
+                    await twilioClient.messages.create({
+                        body: `Cafena: Great news, ${orderData.customerName}! Your order is ready for pickup!`,
+                        from: twilioPhoneNumber,
+                        to: formattedPhone
+                    });
+                }
+            } catch (smsError) {
+                console.error("Error sending ready SMS:", smsError);
             }
         }
 
