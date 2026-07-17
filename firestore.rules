@@ -32,10 +32,11 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
-    // Orders: Anyone can create, only admin can read/update/delete
+    // Orders: Anyone can create and get specific orders, only admin can list/update/delete
     match /orders/{orderId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow get: if true;
+      allow list, update, delete: if isAdmin();
     }
   }
 }

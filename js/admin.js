@@ -232,9 +232,17 @@ async function loadOrders() {
             const data = doc.data();
             const date = data.createdAt ? data.createdAt.toDate().toLocaleString() : 'N/A';
             const statusClass = data.status === 'paid' ? 'paid' : 'pending';
-            
             let itemsHtml = data.items.map(i => `${i.quantity}x ${i.name}`).join('<br>');
             
+            let actionHtml = '';
+            if (data.status === 'paid' || data.status === 'pending') {
+                actionHtml = `<button class="btn-primary update-order-btn" data-id="${doc.id}" data-status="preparing">Prep</button>`;
+            } else if (data.status === 'preparing') {
+                actionHtml = `<button class="btn-primary update-order-btn" data-id="${doc.id}" data-status="ready" style="background: #28a745;">Ready</button>`;
+            } else if (data.status === 'ready') {
+                actionHtml = `<span style="color: #28a745;"><i class="fas fa-check"></i> Done</span>`;
+            }
+
             html += `
                 <tr>
                     <td>${date}</td>
@@ -243,15 +251,51 @@ async function loadOrders() {
                     <td>${itemsHtml}</td>
                     <td>&#8377;${data.totalAmount}</td>
                     <td><span class="badge ${statusClass}">${data.status}</span></td>
+                    <td>${actionHtml}</td>
                 </tr>
             `;
         });
         
         tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center;">No orders found.</td></tr>';
     } catch (error) {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:#ff5733;">Error loading orders: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="color:#ff5733;">Error loading orders: ${error.message}</td></tr>`;
     }
 }
+
+// Orders Action Delegation
+document.getElementById('orders-table-body').addEventListener('click', async (e) => {
+    if (e.target.classList.contains('update-order-btn')) {
+        const id = e.target.getAttribute('data-id');
+        const newStatus = e.target.getAttribute('data-status');
+        e.target.disabled = true;
+        e.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            // Get user auth token
+            const token = await auth.currentUser.getIdToken();
+            const res = await fetch('https://us-central1-coffeeshop-y81-web-ac1f2.cloudfunctions.net/updateOrderStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ orderId: id, newStatus })
+            });
+            const data = await res.json();
+            if (data.success) {
+                loadOrders(); // Refresh table
+            } else {
+                alert("Error updating order: " + data.error);
+                e.target.disabled = false;
+                e.target.innerHTML = 'Error';
+            }
+        } catch (error) {
+            alert("Error updating status: " + error.message);
+            e.target.disabled = false;
+            e.target.innerHTML = 'Error';
+        }
+    }
+});
 
 // 2. Load Messages
 async function loadMessages() {

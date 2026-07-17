@@ -151,7 +151,7 @@ exports.verifyPayment = onRequest({ cors: true, invoker: "public" }, async (req,
             if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
                 const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
                 await twilioClient.messages.create({
-                    body: `Cafena: Thank you for your order, ${customerName}! We have received your payment of ₹${totalAmount} for ${items.length} item(s). We are preparing it now!`,
+                    body: `Cafena: Thank you for your order, ${customerName}! Track your order live here: https://coffeeshop-y81-web-ac1f2.web.app/track.html?id=${docId}`,
                     from: twilioPhoneNumber,
                     to: phone
                 });
@@ -262,6 +262,66 @@ Only output the JSON array, no markdown formatting or extra text.`;
 
     } catch (error) {
         console.error("Error getting AI recommendations:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// 5. Update Order Status
+exports.updateOrderStatus = onRequest({ cors: true }, async (req, res) => {
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+
+    // Verify Firebase Auth Token
+    const authHeader = req.headers.authorization || "";
+    if (!authHeader.startsWith("Bearer ")) {
+        res.status(401).json({ success: false, error: "Unauthorized" });
+        return;
+    }
+
+    try {
+        const idToken = authHeader.split("Bearer ")[1];
+        await admin.auth().verifyIdToken(idToken); // Ensure request is from logged in admin
+        
+        const { orderId, newStatus } = req.body;
+        if (!orderId || !newStatus) {
+            res.status(400).json({ success: false, error: "Missing orderId or newStatus" });
+            return;
+        }
+
+        const orderRef = db.collection("orders").doc(orderId);
+        const orderSnap = await orderRef.get();
+        if (!orderSnap.exists) {
+            res.status(404).json({ success: false, error: "Order not found" });
+            return;
+        }
+
+        const orderData = orderSnap.data();
+        await orderRef.update({
+            status: newStatus,
+            updatedAt: FieldValue.serverTimestamp()
+        });
+
+        // If status is "ready", send SMS
+        if (newStatus === "ready") {
+            const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+            const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+            const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+            
+            if (twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
+                const twilioClient = twilio(twilioAccountSid, twilioAuthToken);
+                await twilioClient.messages.create({
+                    body: `Cafena: Great news, ${orderData.customerName}! Your order is ready for pickup!`,
+                    from: twilioPhoneNumber,
+                    to: orderData.phone
+                });
+            }
+        }
+
+        res.json({ success: true, message: "Order status updated successfully" });
+    } catch (error) {
+        console.error("Error updating order status:", error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

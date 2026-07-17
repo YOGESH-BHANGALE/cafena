@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Order | Cafena</title>
+
+    <!-- font awesome cdn link  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- custom css file link  -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .track-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: url(images/home-bg.jpeg) no-repeat;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .track-card {
+            background: rgba(0, 0, 0, 0.85);
+            padding: 3rem;
+            border-radius: 1rem;
+            border: 1px solid var(--main-color);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .track-card h1 {
+            color: #fff;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .track-card h1 span {
+            color: var(--main-color);
+        }
+
+        .status-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .status-timeline::before {
+            content: '';
+            position: absolute;
+            top: 35%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #333;
+            z-index: 1;
+        }
+
+        .status-step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            background: #111;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #666;
+            border: 2px solid #333;
+            transition: 0.3s;
+        }
+
+        .status-step.active .status-icon, .status-step.completed .status-icon {
+            background: var(--main-color);
+            color: #fff;
+            border-color: var(--main-color);
+            box-shadow: 0 0 15px var(--main-color);
+        }
+
+        .status-text {
+            color: #aaa;
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .status-step.active .status-text, .status-step.completed .status-text {
+            color: #fff;
+        }
+
+        .order-details {
+            text-align: left;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .order-details h3 {
+            color: var(--main-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .order-info p {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .order-items-list {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            color: #ccc;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        .order-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .loader {
+            color: var(--main-color);
+            font-size: 3rem;
+        }
+
+        .btn-home {
+            display: inline-block;
+            margin-top: 3rem;
+            padding: 1rem 3rem;
+            font-size: 1.7rem;
+            color: #fff;
+            background: var(--main-color);
+            cursor: pointer;
+            border-radius: 0.5rem;
+            text-decoration: none;
+        }
+        .btn-home:hover {
+            letter-spacing: .2rem;
+        }
+        
+        #error-msg {
+            color: #ff4d4d;
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+<section class="track-container">
+    <div class="track-card">
+        <h1><span>Track</span> Order</h1>
+        
+        <div id="loader" class="loader">
+            <i class="fas fa-spinner fa-spin"></i>
+            <div style="font-size: 1.5rem; margin-top: 1rem; color: #fff;">Loading order details...</div>
+        </div>
+
+        <div id="error-msg"></div>
+
+        <div id="order-content" style="display: none;">
+            <div class="status-timeline">
+                <div class="status-step" id="step-pending">
+                    <div class="status-icon"><i class="fas fa-clock"></i></div>
+                    <div class="status-text">Pending</div>
+                </div>
+                <div class="status-step" id="step-preparing">
+                    <div class="status-icon"><i class="fas fa-coffee"></i></div>
+                    <div class="status-text">Preparing</div>
+                </div>
+                <div class="status-step" id="step-ready">
+                    <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="status-text">Ready</div>
+                </div>
+            </div>
+
+            <div class="order-details">
+                <h3>Order Info</h3>
+                <div class="order-info">
+                    <p><strong>Name:</strong> <span id="c-name"></span></p>
+                    <p><strong>Order ID:</strong> <span id="c-orderid"></span></p>
+                    <p><strong>Total Paid:</strong> &#8377;<span id="c-total"></span></p>
+                </div>
+                
+                <div class="order-items-list" id="c-items">
+                    <!-- Items go here -->
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html" class="btn-home">Back to Home</a>
+    </div>
+</section>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<!-- Make sure to use the correct firebase-config for the project. For this project, we can fetch it dynamically or just define it -->
+<script>
+    // Quick inline init since we don't have a shared module yet.
+    // In production, we'd include a shared config script.
+    fetch('/__/firebase/init.json').then(async response => {
+        firebase.initializeApp(await response.json());
+        const db = firebase.firestore();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+
+        const loader = document.getElementById('loader');
+        const content = document.getElementById('order-content');
+        const errorMsg = document.getElementById('error-msg');
+
+        if (!orderId) {
+            loader.style.display = 'none';
+            errorMsg.innerText = "No order ID provided in the URL.";
+            errorMsg.style.display = 'block';
+            return;
+        }
+
+        // Listen for real-time updates!
+        db.collection('orders').doc(orderId).onSnapshot((doc) => {
+            loader.style.display = 'none';
+            
+            if (!doc.exists) {
+                errorMsg.innerText = "Order not found. Please check your link.";
+                errorMsg.style.display = 'block';
+                content.style.display = 'none';
+                return;
+            }
+
+            const data = doc.data();
+            content.style.display = 'block';
+
+            // Populate Info
+            document.getElementById('c-name').innerText = data.customerName;
+            document.getElementById('c-orderid').innerText = data.orderId || doc.id;
+            document.getElementById('c-total').innerText = data.totalAmount;
+
+            // Populate Items
+            const itemsDiv = document.getElementById('c-items');
+            itemsDiv.innerHTML = '';
+            data.items.forEach(item => {
+                itemsDiv.innerHTML += `
+                    <div class="order-item">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>&#8377;${item.price * item.quantity}</span>
+                    </div>
+                `;
+            });
+
+            // Update Status Timeline
+            const status = data.status || 'pending'; // 'pending' (paid), 'preparing', 'ready'
+            
+            const sPending = document.getElementById('step-pending');
+            const sPreparing = document.getElementById('step-preparing');
+            const sReady = document.getElementById('step-ready');
+
+            // Reset all
+            sPending.className = 'status-step';
+            sPreparing.className = 'status-step';
+            sReady.className = 'status-step';
+
+            if (status === 'pending' || status === 'paid') {
+                sPending.classList.add('active');
+            } else if (status === 'preparing') {
+                sPending.classList.add('completed');
+                sPreparing.classList.add('active');
+            } else if (status === 'ready') {
+                sPending.classList.add('completed');
+                sPreparing.classList.add('completed');
+                sReady.classList.add('active');
+            }
+        }, (error) => {
+            console.error("Error fetching order:", error);
+            loader.style.display = 'none';
+            errorMsg.innerText = "Failed to load order. Make sure you have permission.";
+            errorMsg.style.display = 'block';
+        });
+
+    }).catch(error => {
+        console.error("Firebase init failed:", error);
+    });
+</script>
+
+</body>
+</html>
