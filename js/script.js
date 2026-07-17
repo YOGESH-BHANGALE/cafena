@@ -99,9 +99,6 @@ let cart = JSON.parse(localStorage.getItem('coffee_shop_cart')) || [];
 function saveCart() {
     localStorage.setItem('coffee_shop_cart', JSON.stringify(cart));
     renderCart();
-    if (cartItem.classList.contains('active')) {
-        fetchAIRecommendations();
-    }
 }
 
 function addToCart(name, price, image) {
@@ -112,6 +109,8 @@ function addToCart(name, price, image) {
         cart.push({ name, price, image, quantity: 1 });
     }
     
+    // Auto open cart for user feedback
+    cartItem.classList.add('active');
     saveCart();
     showToast(`Added ${name} to your cart!`);
 }
